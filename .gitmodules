@@ -1,0 +1,6 @@
+[submodule "overhead/kaji"]
+	path = overhead/kaji
+	url = git://github.com/tuxology/kaji.git
+[submodule "startup/kaji"]
+	path = startup/kaji
+	url = git://github.com/tuxology/kaji.git
