@@ -1,0 +1,70 @@
+#!/bin/sh
+
+export ITERS=2
+export NR_EVENTS=10000000
+export NR_CPUS=1
+EV_OR_CPUS=$NR_EVENTS
+
+RESULT_FILE="results/result-$NR_EVENTS-$NR_CPUS.dat"
+PROG_NOTRACING="./bench_notrace $NR_CPUS $NR_EVENTS"
+PROG_TRACING="./bench_trace $NR_CPUS $NR_EVENTS"
+PROG_DYNINST="DYNINSTAPI_RT_LIB=/usr/lib64/dyninst/libdyninstAPI_RT.so ./mutator ./dyntp.so ./bench_notrace $NR_CPUS $NR_EVENTS"
+#: ${PROG_STAPDYN:="stap stapdyn/int_test.stp --dyninst -c './bench_notrace $NR_CPUS $NR_EVENTS'"}
+PROG_KAJI="./kaji.sh"
+
+echo "-- NR_EVENTS=$NR_EVENTS, NR_CPUS=$NR_CPUS --"
+
+# Prep result files
+# The final files for plotting are written as : Threads\tClean\tStatic\tDynamic(UST)\tDynamic(Kaji)
+rm -f results/result-$NR_EVENTS-$NR_CPUS.dat
+echo -e -n $EV_OR_CPUS"\t" 2>&1 | tee -a $RESULT_FILE
+
+function clean {
+    echo "No tracing:"
+    t=0
+    for i in $(seq $ITERS); do
+        sync; echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+        tt=$(sh -c "$PROG_NOTRACING"); echo $tt"s"; t="$t+$tt"
+    done
+    echo "avg:"
+    echo -e -n "$(echo "scale=6;($t)/$ITERS" | bc -l)\t" 2>&1 | tee -a $RESULT_FILE
+    echo
+}
+
+function lttng_bench {
+    t=0
+    for i in $(seq $ITERS); do
+        sync; echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+        lttng -q create; lttng -q enable-event -a -u; lttng -q start
+        tt=$(bash -c "$*"); echo $tt"s"; t="$t+$tt"
+        lttng -q stop; sleep 1; lttng -q destroy
+    done
+    echo "avg:"
+    echo -e -n "$(echo "scale=6;($t)/$ITERS" | bc -l)\t" 2>&1 | tee -a $RESULT_FILE
+    echo
+}
+
+#function stapdyn_bench {
+    #t=0
+    #for i in $(seq $ITERS); do
+        #sync; echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+        #tt=$(sh -c "$PROG_STAPDYN" | tail -1); echo $tt"s"; t="$t+$tt"
+    #done
+    #echo "avg:"
+    #echo -e -n "$(echo "scale=6;($t)/$ITERS" | bc -l)\t" 2>&1 | tee -a $RESULT_FILE
+    #echo
+#}
+echo "Clean Run:"
+clean
+
+echo "Static Tracepoint:"
+lttng_bench $PROG_TRACING
+
+#echo "Dynamic tracepoint using dyninst (UST) (default option):"
+#lttng_bench $PROG_DYNINST
+
+echo "Dynamic Tracepoint (Dyninst - setTrampRecursive=true, setSaveFPR=false):"
+lttng_bench "SET_TRAMP_RECURSIVE=true SET_SAVE_FPR=false $PROG_DYNINST"
+
+echo "Dynamic (Kaji)"
+lttng_bench $PROG_KAJI
