@@ -62,7 +62,6 @@ void signal_handler(int sig) {
 
 int main(int argc, char **argv)
 {
-
 #ifdef KAJI
 	signal(SIGUSR1, signal_handler);
 	pause();
@@ -75,7 +74,6 @@ int main(int argc, char **argv)
 		usage(argv);
 		exit(0);
 	}
-
 	nr_cpus = atoi(argv[1]);
 	nr_events = atol(argv[2]);
 

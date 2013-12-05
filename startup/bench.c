@@ -49,11 +49,5 @@ void signal_handler(int sig) {
 
 int main(int argc, char **argv)
 {
-    int ret;
-#ifdef KAJI
-	signal(SIGUSR1, signal_handler);
-	pause();
-#endif
-    ret = kill(atoi(argv[1]), SIGUSR2);
 	return 0;
 }

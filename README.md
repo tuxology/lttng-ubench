@@ -1,7 +1,7 @@
 lttng-ubench
 ============
 
-Micro benchmarks  for LTTng/UST - mainly for dynamic userspace tracing
+Micro benchmarks for LTTng/UST - mainly for dynamic userspace tracing
 
 Installing
 ----------
@@ -9,7 +9,7 @@ Installing
 
 Using
 -----
-Go through the script `run`. Some manual tweaking is required for now
+Go through the script `run.sh`. Some manual tweaking is required for now
 
 TODO
 ----
