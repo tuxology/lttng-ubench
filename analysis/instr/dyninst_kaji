@@ -1,30 +1,28 @@
-
 =================================== Before Instrumentation =========================================
 
-
 Dump of assembler code for function do_stuff:
-   0x00000000004009e8 <+0>:	55                     push   %rbp
-   0x00000000004009e9 <+1>:	48 89 e5               mov    %rsp,%rbp
-   0x00000000004009ec <+4>:	c7 45 fc 2a 00 00 00	  movl   $0x2a,-0x4(%rbp)		# int v = 42; Was necessary to have this so that kaji could get a point in do_stuff > 5 bytes
-   0x00000000004009f3 <+11>:	5d						     pop    %rbp
-   0x00000000004009f4 <+12>:	c3						     retq
+   0x00000000004009e8 <+0>:     55                      push   %rbp
+   0x00000000004009e9 <+1>:     48 89 e5                mov    %rsp,%rbp
+   0x00000000004009ec <+4>:     c7 45 fc 2a 00 00 00    movl   $0x2a,-0x4(%rbp)     # int v = 42; Was necessary to have this so that kaji could get a point in do_stuff > 5 bytes
+   0x00000000004009f3 <+11>:    5d                      pop    %rbp
+   0x00000000004009f4 <+12>:    c3                      retq
 
 =================================== After Dyninst Instrumentation ==================================
 
 Dump of assembler code for function do_stuff:
-   0x00000000004009e8 <+0>:	e9 13 f6 c0 ff	        jmpq   0x10000
-   0x00000000004009ed <+5>:	45 fc				        rex.RB cld                  # replaced but 1 byte missed. Not really an issue
-   0x00000000004009ef <+7>:	2a 00				        sub    (%rax),%al
-   0x00000000004009f1 <+9>:	00 00				        add    %al,(%rax)
-   0x00000000004009f3 <+11>:	5d					        pop    %rbp
-   0x00000000004009f4 <+12>:	c3					        retq 
+   0x00000000004009e8 <+0>:     e9 13 f6 c0 ff          jmpq   0x10000
+   0x00000000004009ed <+5>:     45 fc                   rex.RB cld                  # replaced but 1 byte missed. Not really an issue
+   0x00000000004009ef <+7>:     2a 00                   sub    (%rax),%al
+   0x00000000004009f1 <+9>:     00 00                   add    %al,(%rax)
+   0x00000000004009f3 <+11>:    5d                      pop    %rbp
+   0x00000000004009f4 <+12>:    c3                      retq
 
 =================================== How dyninst works ==============================================
 
 (gdb) x/80i 0x10000
-   0x10000:	push   %rbp
+   0x10000:    push   %rbp
    0x10001:	mov    %rsp,%rbp
-   0x10004:	movl   $0x2a,-0x4(%rbp)					     # int v = 42;
+   0x10004:	movl   $0x2a,-0x4(%rbp)                 # int v = 42;
    0x1000b:	pop    %rbp
    0x1000c:	lea    -0xa8(%rsp),%rs
    0x10014:	mov    %rax,0x20(%rsp)
@@ -32,7 +30,7 @@ Dump of assembler code for function do_stuff:
    0x10021:	and    $0xffffffffffffffe0,%rsp
    0x10025:	mov    %rax,(%rsp)
    0x10029:	mov    -0x88(%rax),%rax
-   0x10030:	push   %rax								        # save all regs
+   0x10030:	push   %rax                             # save all regs
    0x10031:	push   %rbx
    0x10032:	push   %rcx
    0x10033:	push   %rdx
@@ -42,10 +40,10 @@ Dump of assembler code for function do_stuff:
    0x10038:	push   %r13
    0x1003a:	push   %r14
    0x1003c:	push   %r15
-   0x1003e:	lea    -0x10(%rsp),%rsp					     # align stack frame
+   0x1003e:	lea    -0x10(%rsp),%rsp                 # align stack frame
    0x10043:	movabs $0x0,%rax
-   0x1004d:	movabs $0x7f91924184b0,%rbx				  # 0x7f91924184b0 = DYNINSTthreadIndex
-   0x10057:	callq  *%rbx							        # call DYNINSTthreadIndex
+   0x1004d:	movabs $0x7f91924184b0,%rbx             # 0x7f91924184b0 = DYNINSTthreadIndex
+   0x10057:	callq  *%rbx                            # call DYNINSTthreadIndex
    0x10059:	lea    0x10(%rsp),%rsp
    0x1005e:	mov    %rax,%rbx
    0x10061:	pop    %r15
@@ -56,7 +54,7 @@ Dump of assembler code for function do_stuff:
    0x1006a:	pop    %rax
    0x1006b:	mov    %rbx,%r10
    0x1006e:	shl    $0x2,%r10
-   0x10072:	movabs $0x7f919262e220,%rbx				  # 0x7f91924184b0 = DYNINST_default_tramp_guards 	[array to check recursive calls]
+   0x10072:	movabs $0x7f919262e220,%rbx             # 0x7f91924184b0 = DYNINST_default_tramp_guards 	[array to check recursive calls]
    0x1007c:	mov    %r10,%r11
    0x1007f:	add    %rbx,%r11
    0x10082:	mov    (%r11),%eax
@@ -70,12 +68,12 @@ Dump of assembler code for function do_stuff:
    0x100a0:	push   %r13
    0x100a2:	push   %r14
    0x100a4:	push   %r15
-   0x100a6:	lea    -0x10(%rsp),%rsp					     # align stack frame
+   0x100a6:	lea    -0x10(%rsp),%rsp                 # align stack frame
    0x100ab:	movabs $0x601064,%rax
    0x100b5:	mov    (%rax),%edi
    0x100b7:	movabs $0x0,%rax
-   0x100c1:	movabs $0x7f91921e9a06,%rbx				  # 0x7f91921e9a06 = tpint()	 	[from dyntp.so - calls tracepoint]
-   0x100cb:	callq  *%rbx							        # call tpint
+   0x100c1:	movabs $0x7f91921e9a06,%rbx             # 0x7f91921e9a06 = tpint()	 	[from dyntp.so - calls tracepoint]
+   0x100cb:	callq  *%rbx                            # call tpint
    0x100cd:	lea    0x10(%rsp),%rspi
    0x100d2:	pop    %r15
    0x100d4:	pop    %r14
@@ -90,21 +88,20 @@ Dump of assembler code for function do_stuff:
    0x100ec:	pop    %rbx
    0x100ed:	pop    %rax
    0x100ee:	mov    (%rsp),%rsp
-   0x100f2:	retq 
-
+   0x100f2:	retq
 
 ========================= Optimized Dyninst (disable recursive trampoline guard and floating point reg save) ==================================
 
 (gdb) x/80i 0x10000
-   0x10000:	push   %rbp								       /================================\
-   0x10001:	mov    %rsp,%rbp						       |	Execute everything before 
-   0x10004:	movl   $0x2a,-0x4(%rbp)					    |	ret of do_stuff out of line
-   0x1000b:	pop    %rbp								       \--------------------------------/
-   0x1000c:	lea    -0xa8(%rsp),%rsp                 # trampoline starts here - rsp trick!
+   0x10000:	push   %rbp                             /================================\
+   0x10001:	mov    %rsp,%rbp                        |   Execute everything before 
+   0x10004:	movl   $0x2a,-0x4(%rbp)                 |   ret of do_stuff out of line
+   0x1000b:	pop    %rbp                             \--------------------------------/
+   0x1000c:	lea    -0xa8(%rsp),%rsp                 # trampoline starts here - grow stack
    0x10014:	mov    %rax,0x20(%rsp)                  # save rax
-   0x10019:	lea    0xa8(%rsp),%rax                  # rax has the rsp which was displaced
-   0x10021:	and    $0xffffffffffffffe0,%rsp         # align the stack
-   0x10025:	mov    %rax,(%rsp)                      # original rsp is restored now
+   0x10019:	lea    0xa8(%rsp),%rax                  # rax contains the original rsp value
+   0x10021:	and    $0xffffffffffffffe0,%rsp         # align the top of the stack
+   0x10025:	mov    %rax,(%rsp)                      # save the original rsp value at the top of the current stack
    0x10029:	mov    -0x88(%rax),%rax                 # thanks for your help rax. we restore you now
    0x10030:	push   %rax                             # save registers
    0x10031:	push   %rbx
@@ -115,13 +112,13 @@ Dump of assembler code for function do_stuff:
    0x10037:	push   %r13
    0x10039:	push   %r14
    0x1003b:	push   %r15
-   0x1003d:	lea    -0x18(%rsp),%rsp                 # The rsp trick for aligning stack frame?
-   0x10042:	movabs $0x601064,%rax				       # 0x601064 is var = 43
-   0x1004c:	mov    (%rax),%edi
+   0x1003d:	lea    -0x18(%rsp),%rsp                 # grow stack
+   0x10042:	movabs $0x601064,%rax                   # Load address of "var" in rax (0x601064 is var = 43)
+   0x1004c:	mov    (%rax),%edi                      # Move "var" in edi (first parameter of function)
    0x1004e:	movabs $0x0,%rax
-   0x10058:	movabs $0x7f448928fa06,%rbx				 # 0x7f91921e9a06 = tpint()	 	[from dyntp.so - calls tracepoint]
-   0x10062:	callq  *%rbx							       # call tpint
-   0x10064:	lea    0x18(%rsp),%rsp
+   0x10058:	movabs $0x7f448928fa06,%rbx             # 0x7f91921e9a06 = tpint()	 	[from dyntp.so - calls tracepoint]
+   0x10062:	callq  *%rbx                            # call tpint
+   0x10064:	lea    0x18(%rsp),%rsp                  # shrink stack
    0x10069:	pop    %r15                             # restore all regs
    0x1006b:	pop    %r14
    0x1006d:	pop    %r13
@@ -131,19 +128,19 @@ Dump of assembler code for function do_stuff:
    0x10073:	pop    %rcx
    0x10074:	pop    %rbx
    0x10075:	pop    %rax
-   0x10076:	mov    (%rsp),%rsp
-   0x1007a:	retq   
+   0x10076:	mov    (%rsp),%rsp                      # restore original rsp value
+   0x1007a:	retq
 
 
 =================================== Kaji's instrumentation ======================================
 
 Dump of assembler code for function do_stuff:
-   0x0000000000400aa0 <+0>:	push   %rbp
-   0x0000000000400aa1 <+1>:	mov    %rsp,%rbp
-   0x0000000000400aa4 <+4>:	jmpq   0x1000010
-   0x0000000000400aa9 <+9>:	add    %al,(%rax)
-   0x0000000000400aab <+11>:	pop    %rbp
-   0x0000000000400aac <+12>:	retq
+   0x0000000000400aa0 <+0>:     push   %rbp
+   0x0000000000400aa1 <+1>:     mov    %rsp,%rbp
+   0x0000000000400aa4 <+4>:     jmpq   0x1000010
+   0x0000000000400aa9 <+9>:     add    %al,(%rax)
+   0x0000000000400aab <+11>:    pop    %rbp
+   0x0000000000400aac <+12>:    retq
 
 =================================== What kaji did ===============================================
 
@@ -160,8 +157,8 @@ End of assembler dump.
    0x10000b:	push   %r13
    0x10000d:	push   %r14
    0x10000f:	push   %r15
-   0x100011:	movabs $0x7f65432cb472,%rax			 # kaji_int_probe()
-   0x10001b:	callq  *%rax						       # call kaji_int_probe()
+   0x100011:	movabs $0x7f65432cb472,%rax         # kaji_int_probe()
+   0x10001b:	callq  *%rax                        # call kaji_int_probe()
    0x10001d:	pop    %r15
    0x10001f:	pop    %r14
    0x100021:	pop    %r13
@@ -173,5 +170,5 @@ End of assembler dump.
    0x100029:	pop    %r9
    0x10002b:	pop    %r8
    0x10002d:	pop    %rax
-   0x10002e:	movl   $0x2a,-0x4(%rbp)
+   0x10002e:	movl   $0x2a,-0x4(%rbp)             # Execute displaced instruction
    0x100035:	jmpq   0x400aab <do_stuff+11>
