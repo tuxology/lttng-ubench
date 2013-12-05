@@ -10,8 +10,8 @@ Dump of assembler code for function do_stuff:
 =================================== After Dyninst Instrumentation ==================================
 
 Dump of assembler code for function do_stuff:
-   0x00000000004009e8 <+0>:     e9 13 f6 c0 ff          jmpq   0x10000
-   0x00000000004009ed <+5>:     45 fc                   rex.RB cld                  # replaced but 1 byte missed. Not really an issue
+   0x00000000004009e8 <+0>:     e9 13 f6 c0 ff          jmpq   0x10000              # replace 1st 5 bytes with the jump to trampoline
+   0x00000000004009ed <+5>:     45 fc                   rex.RB cld                  # garbage
    0x00000000004009ef <+7>:     2a 00                   sub    (%rax),%al
    0x00000000004009f1 <+9>:     00 00                   add    %al,(%rax)
    0x00000000004009f3 <+11>:    5d                      pop    %rbp
