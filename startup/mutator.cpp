@@ -4,10 +4,31 @@
 #include <dyninst/BPatch_function.h>
 #include <vector>
 #include <cstdlib>
+#include <time.h>
 
-#define NR_FUNCS 1000
+#define NR_FUNCS 10
+
+double accum;
+struct timespec ts_start, ts_end;
+
+void tic(){
+    clock_gettime(CLOCK_MONOTONIC, &ts_start);
+}
+
+void toc(){
+    clock_gettime(CLOCK_MONOTONIC, &ts_end);
+    accum = (ts_end.tv_sec - ts_start.tv_sec) + (double)(ts_end.tv_nsec - ts_start.tv_nsec)/1e9;
+    FILE *fp;
+    fp = fopen("results/instr_cost.dat", "a+");
+    if (fp == NULL) {
+        fprintf(stderr, "Can't open result file\n");
+        exit(1);
+    }
+    fprintf(fp, "%f\n", accum);
+}
 
 int main (int argc, const char* argv[]) {
+    tic();
     BPatch bpatch;
 
     // argv[2] is mutatee's file name, will be mutatee's argv[0]
@@ -45,6 +66,6 @@ int main (int argc, const char* argv[]) {
     while (!proc->isTerminated()) {
         bpatch.waitForStatusChange();
     }*/
-
+    toc();
     return 0;
 }

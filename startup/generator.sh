@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export NR_FUNCS=1000
+export NR_FUNCS=10
 
 rm -f dostuff.h dostuff.c dyntp.c ust_tests_benchmark.h
 
