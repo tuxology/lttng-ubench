@@ -10,12 +10,14 @@ extern "C" {
 
 #include <lttng/tracepoint.h>
 
-TRACEPOINT_EVENT(ust_tests_benchmark, tpint,
+{% for number in range(n) %}
+TRACEPOINT_EVENT(ust_tests_benchmark, tpint{{ number }},
     TP_ARGS(int, var),
     TP_FIELDS(
         ctf_integer(int, var, var)
     )
 )
+{% endfor %}
 
 TRACEPOINT_EVENT(ust_tests_benchmark, tpbench,
 	TP_ARGS(),

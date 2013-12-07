@@ -29,23 +29,20 @@
 static int nr_cpus;
 static unsigned long nr_events;
 
-void *function(void *arg)
-{
-	unsigned long i;
+/*void *function(void *arg)*/
+/*{*/
+	/*unsigned long i;*/
 
-	for(i = 0; i < nr_events; i++) {
-		do_stuff();
-	}
-	return NULL;
-}
+	/*for(i = 0; i < nr_events; i++) {*/
+		/*do_stuff();*/
+	/*}*/
+	/*return NULL;*/
+/*}*/
 
 void usage(char **argv) {
 	printf("Usage: %s pid\n", argv[0]);
 }
 
-void signal_handler(int sig) {
-    do_stuff();
-}
 
 int main(int argc, char **argv)
 {

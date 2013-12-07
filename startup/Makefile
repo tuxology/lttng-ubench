@@ -1,3 +1,4 @@
+
 all: dyntp.so mutator bench_notrace bench_trace bench_notrace_kaji bench_nomain time_keeper bench_nomain_kaji
 	$(MAKE) -C kaji
 
@@ -58,5 +59,6 @@ time_keeper: time_keeper.c
 
 .PHONY: clean
 clean:
-	rm -f *.o *.so mutator bench_notrace bench_trace bench_notrace_kaji bench_nomain bench_nomain_kaji time_keeper
+	rm -f *.o *.so mutator bench_notrace bench_trace bench_notrace_kaji \
+	bench_nomain bench_nomain_kaji time_keeper
 	$(MAKE) -C kaji clean
